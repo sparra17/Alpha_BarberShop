@@ -1,0 +1,74 @@
+parte1/////
+juegoCtrl.renderEditarJuego = async (req,res) => {
+    const {id} = req.params;
+    const juego = await pool.query('SELECT * FROM juegos WHERE juegos_id = ?', [id]);
+    res.render('juegos/editar', {juego : juego[0]});
+}
+
+
+parte2//////
+
+juegoCtrl.editarJuego = async (req,res) => {
+    const {id} = req.params;
+    const { nombre, descripcion, instrucciones, nivel, vocabulario } = req.body;
+    if (req.file){
+        const juego = await pool.query('SELECT * FROM juegos WHERE juegos_id = ?', [id]);
+        fs.unlinkSync(path.join(__dirname, "../public/"+juego[0].ruta_imagen));
+        const { filename } = req.file;
+        const nuevoJuego = {
+            nombre,
+            descripcion,
+            instrucciones,
+            ruta_imagen: 'img/subidas/' + filename, 
+            nivel,
+            vocabulario
+        };
+
+        await pool.query('UPDATE juegos set ? WHERE juegos_id= ?', [nuevoJuego, id]);
+    } else {
+        const nuevoJuego = {
+            nombre,
+            descripcion,
+            instrucciones,
+            nivel,
+            vocabulario
+        };
+
+        await pool.query('UPDATE juegos set ? WHERE juegos_id= ?', [nuevoJuego, id]);
+    }
+    req.flash('mensajeExito', 'Ha editado el juego correctamente')
+    res.redirect('/juegos');
+
+};
+
+
+
+//////parte 3
+<div class="container p-4">
+    <div class="row">
+        <div class="col-md-4 mx-auto">
+            <div class="card">
+                <div class="card-body">
+                    <form action="/juegos/editar/{{juego.juegos_id}}" method="post" enctype="multipart/form-data">
+                        <div class="form-group"><input class="form-control" value="{{juego.nombre}}" type="text" name="nombre" placeholder="Nombre del juego" autofocus></div>
+                        <div class="form-group"><textarea class="form-control" name="descripcion" placeholder="Descripcion" rows="3">{{juego.descripcion}}</textarea></div>
+                        <div class="form-group p-1">
+                            <label class="form-label">Agregue la imagen del juego</label>
+                            <div class="input-group mb-3">
+                            <input type="file" class="form-control" name="imagen">
+                        </div>
+                        <div class="form-group"><textarea class="form-control" name="instrucciones" placeholder="Instrucciones" rows="3">{{juego.instrucciones}}</textarea></div>
+                        <div class="form-group ">
+                            <label class="form-label">¿Para que nivel esta recomendado?</label>
+                            <input type="range" class="form-range" min="0" max="6" name="nivel">
+                        </div>
+                        <div class="form-group"><input class="form-control" value="{{juego.vocabulario}}" type="text" name="vocabulario" placeholder="Vocabulario del juego"</div>
+                        <button class="btn btn-info col-12 mt-2">Editar Juego</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -35,7 +35,7 @@ router.post('/notes/new-note', isAuthenticated, async (req, res) => { /*ruta par
     const newNote = new Note({title, description, date}); //Crea un nuevo dato new Note y se le va a pasar el titulo y la descripcion y se almacena en una constante newNote
     newNote.user = req.user.id; //se enlaza el id del usuario con la nota para ver solamente las notas de dicho usuario
     await newNote.save(); //guarda la nota en la base de datos de forma asincrona
-    req.flash('success_msg', 'Nota Agregada') //Una vez guardada la nota va a mostrar un mensaje de exito
+    req.flash('success_msg', 'Cita Agregada') //Una vez guardada la nota va a mostrar un mensaje de exito
     res.redirect('/notes'); //una vez guardado se redirecciona a /notes, muestra las notas en la db
   }
 });
